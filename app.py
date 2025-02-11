@@ -3,7 +3,7 @@ import random
 
 def main():
     # アプリのタイトル
-    st.title("ランダムな数字")
+    st.title("ランダムな数字!")
 
     # 数字の範囲を指定するスライダー
     st.sidebar.title("範囲を指定してください！！")
