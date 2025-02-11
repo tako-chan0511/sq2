@@ -6,7 +6,7 @@ def main():
     st.title("ランダムな数字")
 
     # 数字の範囲を指定するスライダー
-    st.sidebar.title("範囲を指定してください")
+    st.sidebar.title("範囲を指定してください！！")
     min_value = st.sidebar.number_input("最小値", value=10, step=1)
     max_value = st.sidebar.number_input("最大値", value=99, step=1)
 
