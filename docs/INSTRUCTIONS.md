@@ -1,4 +1,4 @@
-# ランダムな2桁の2乗数を充てるゲーム
+# ランダムな2桁の2乗数を当てるゲーム
 https://squared-cypmgjuwvks8uqqehiuy2p.streamlit.app/
 
 ## 左サイドメニューで範囲を指定可能
