@@ -1,52 +1,51 @@
 import streamlit as st
 import random
 import os
-import json
-import base64
 
-def inject_pwa_manifest():
+def inject_pwa():
     """
-    PWAの「ホーム画面への追加」機能に必要なmanifest.jsonを注入します。
-    Service Worker関連のコードは、Streamlitの制約により削除しました。
+    PWA化に必要なHTMLタグをStreamlitアプリに注入する関数。
+    Streamlit CloudのURL構造に合わせてパスを定義します。
     """
-    # manifest.jsonのパスを定義
-    manifest_path = 'static/manifest.json'
-
-    # manifest.jsonを読み込み、Data URIに変換（ファイルパス問題を回避）
-    try:
-        with open(manifest_path, 'r', encoding='utf-8') as f:
-            manifest_data = json.load(f)
-        manifest_str = json.dumps(manifest_data)
-        manifest_b64 = base64.b64encode(manifest_str.encode('utf-8')).decode('utf-8')
-        manifest_url = f"data:application/manifest+json;base64,{manifest_b64}"
-    except Exception as e:
-        print(f"manifest.jsonの読み込みに失敗: {e}")
-        # 失敗した場合は、公開環境でのパスをフォールバックとして使用
-        manifest_url = "/static/manifest.json"
-
-    # アイコンとテーマカラーのパス
+    # Streamlit Cloudでは /static/ で提供される
+    manifest_url = "/static/manifest.json"
+    sw_url = "/static/sw.js"
     icon_url = "/static/icon-192x192.png" 
     theme_color = "#343434"
 
-    # 注入するHTMLタグ（Service Workerのscriptタグを削除）
     pwa_tags = f'''
         <link rel="manifest" href="{manifest_url}">
         <link rel="apple-touch-icon" href="{icon_url}">
         <meta name="theme-color" content="{theme_color}">
+        <script>
+            if ('serviceWorker' in navigator) {{
+                window.addEventListener('load', function() {{
+                    navigator.serviceWorker.register('{sw_url}').then(function(registration) {{
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    }}, function(err) {{
+                        console.log('ServiceWorker registration failed: ', err);
+                    }});
+                }});
+            }}
+        </script>
     '''
-    # st.markdown を使ってHTMLをページの<head>に近い部分に注入
+    # st.markdown を使ってHTMLをページの<head>に近い部分に注入する
     st.markdown(pwa_tags, unsafe_allow_html=True)
 
 def main():
+    # ページ設定は、他のStreamlitコマンドより先に一度だけ呼び出す
     st.set_page_config(
         page_title="2乗数当てゲーム",
         page_icon="static/icon-192x192.png" 
     )
-    
-    # PWAのマニフェストを注入
-    inject_pwa_manifest()
 
+    # アプリのタイトル
     st.title("ランダムな数字!")
+
+    # PWAスクリプトを注入
+    inject_pwa()
+
+    # --- ここからが、元のアプリケーションコード ---
 
     st.sidebar.title("範囲を指定してください！！")
     min_value = st.sidebar.number_input("最小値", value=10, step=1)
